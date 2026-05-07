@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Shop</title>
+
+<style>
+
+body{
+  background:#0f172a;
+  color:white;
+  font-family:Arial;
+  margin:0;
+}
+
+/* TOP BAR */
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:15px 30px;
+  background:#111827;
+  position:sticky;
+  top:0;
+  z-index:999;
+  box-shadow:0 2px 10px rgba(0,0,0,0.4);
+}
+
+.logo{
+  font-size:28px;
+  font-weight:bold;
+  letter-spacing:1px;
+}
+
+.menu{
+  display:flex;
+  gap:25px;
+}
+
+.menu button{
+  background:none;
+  border:none;
+  color:white;
+  cursor:pointer;
+  font-size:16px;
+  font-weight:bold;
+  transition:0.3s;
+}
+
+.menu button:hover{
+  color:#3b82f6;
+  transform:scale(1.05);
+}
+
+/* CONTENT */
+.content{
+  padding:25px;
+}
+
+/* PRODUCTS */
+#products{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:25px;
+}
+
+.card{
+  background:#1e293b;
+  border-radius:16px;
+  overflow:hidden;
+  text-align:center;
+  cursor:pointer;
+  transition:0.3s;
+  box-shadow:0 5px 15px rgba(0,0,0,0.3);
+  padding-bottom:15px;
+}
+
+.card:hover{
+  transform:translateY(-8px);
+  box-shadow:0 10px 25px rgba(0,0,0,0.5);
+}
+
+.card img{
+  width:100%;
+  height:320px;
+  object-fit:cover;
+  display:block;
+}
+
+.card h3{
+  margin-top:15px;
+  font-size:20px;
+  font-weight:bold;
+  padding:0 10px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.card p{
+  color:#38bdf8;
+  font-size:18px;
+  font-weight:bold;
+}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  background:#0f172a;
+  display:none;
+  z-index:9999;
+  overflow:auto;
+}
+
+.modal-content{
+  display:flex;
+  gap:50px;
+  padding:40px;
+}
+
+.left{
+  flex:1;
+}
+
+#mainImg{
+  width:100%;
+  height:600px;
+  object-fit:cover;
+  border-radius:15px;
+  background:#111827;
+}
+
+.thumbs{
+  display:flex;
+  gap:10px;
+  margin-top:15px;
+  flex-wrap:wrap;
+}
+
+.thumbs img{
+  width:90px;
+  height:90px;
+  object-fit:cover;
+  border-radius:10px;
+  cursor:pointer;
+  opacity:0.6;
+  transition:0.3s;
+}
+
+.thumbs img:hover{
+  transform:scale(1.05);
+}
+
+.thumbs img.active{
+  opacity:1;
+  border:3px solid #3b82f6;
+}
+
+.right{
+  flex:1;
+}
+
+.right h2{
+  font-size:35px;
+  margin-bottom:10px;
+}
+
+.right p{
+  font-size:18px;
+  line-height:1.6;
+}
+
+button{
+  padding:12px 20px;
+  border:none;
+  background:#3b82f6;
+  color:white;
+  border-radius:8px;
+  cursor:pointer;
+  margin-top:10px;
+  font-size:16px;
+  font-weight:bold;
+  transition:0.3s;
+}
+
+button:hover{
+  background:#2563eb;
+  transform:scale(1.03);
+}
+
+.buyForm{
+  display:none;
+  margin-top:20px;
+}
+
+.buyForm input,
+.buyForm textarea{
+  width:100%;
+  padding:14px;
+  margin:8px 0;
+  border:none;
+  border-radius:8px;
+  background:#111827;
+  color:white;
+  font-size:15px;
+}
+
+#ordersSection{
+  display:none;
+}
+
+.orderCard{
+  background:#1e293b;
+  padding:20px;
+  border-radius:15px;
+  margin-bottom:20px;
+  display:flex;
+  gap:20px;
+  align-items:center;
+}
+
+.orderCard img{
+  width:140px;
+  height:140px;
+  object-fit:cover;
+  border-radius:12px;
+}
+
+/* AUTH */
+.authBox{
+  width:350px;
+  margin:100px auto;
+  background:#111827;
+  padding:30px;
+  border-radius:20px;
+  text-align:center;
+}
+
+.authBox input{
+  width:100%;
+  padding:12px;
+  margin:10px 0;
+  border:none;
+  border-radius:10px;
+  background:#1e293b;
+  color:white;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+
+  <div class="logo">
+    Shop
+  </div>
+
+  <div class="menu">
+    <button onclick="showProducts()">Home</button>
+    <button onclick="loadOrders()">Orders</button>
+    <button onclick="openAuth()">Login</button>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+</div>
+
+<div class="content">
+
+  <!-- PRODUCTS -->
+  <div id="products"></div>
+
+  <!-- ORDERS -->
+  <div id="ordersSection"></div>
+
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal" id="modal">
+
+  <button onclick="closeModal()">⬅ Back</button>
+
+  <div class="modal-content">
+
+    <div class="left">
+
+      <img id="mainImg">
+
+      <div class="thumbs" id="thumbs"></div>
+
+    </div>
+
+    <div class="right">
+
+      <h2 id="mName"></h2>
+
+      <p id="mPrice"></p>
+
+      <p id="mDesc"></p>
+
+      <button onclick="buyNow()">Buy Now</button>
+
+      <button id="cartBtn">Add to Cart</button>
+
+      <!-- BUY FORM -->
+      <div
+      class="buyForm"
+      id="orderForm">
+
+        <input type="text"
+        id="buyerName"
+        placeholder="Your Name"
+        required>
+
+        <input type="text"
+        id="buyerPhone"
+        placeholder="Phone Number"
+        required>
+
+        <textarea
+        id="buyerAddress"
+        placeholder="Address"
+        required></textarea>
+
+        <button
+        type="button"
+        onclick="confirmOrder()">
+        Confirm Order
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="modal" id="authModal">
+
+  <div class="authBox">
+
+    <h2 id="title">Signup</h2>
+
+    <input type="email"
+    id="email"
+    placeholder="Email">
+
+    <input type="password"
+    id="password"
+    placeholder="Password">
+
+    <!-- OTP -->
+    <input type="text"
+    id="otp"
+    placeholder="OTP"
+    style="display:none;">
+
+    <button
+    onclick="handleAuth()"
+    id="btn">
+    Signup
+    </button>
+
+    <p id="msg"
+    style="margin-top:10px;color:#f87171;"></p>
+
+    <p
+    onclick="toggleMode()"
+    id="toggleText"
+    style="
+      margin-top:15px;
+      color:#38bdf8;
+      cursor:pointer;
+    ">
+      Already have account? Login
+    </p>
+
+    <button
+    onclick="closeAuth()"
+    style="
+      background:#ef4444;
+      width:100%;
+      margin-top:15px;
+    ">
+      Close
+    </button>
+
+  </div>
+
+</div>
+
+<script>
+
+let products = [];
+let selectedProduct = "";
+let selectedProductId = null;
+let isLogin = false;
+
+// LOAD PRODUCTS
+async function load(){
+
+  document.getElementById("products").style.display = "grid";
+
+  document.getElementById("ordersSection").style.display = "none";
+
+  const res = await fetch("http://127.0.0.1:8000/products");
+
+  products = await res.json();
+
+  const c = document.getElementById("products");
+
+  c.innerHTML="";
+
+  products.forEach(p=>{
+
+    const img =
+      (p.images && p.images.length)
+      ? p.images[0]
+      : "https://via.placeholder.com/200";
+
+    c.innerHTML += `
+
+    <div class="card" onclick="openP(${p.id})">
+
+      <img src="${img}">
+
+      <h3>${p.name}</h3>
+
+      <p>₹${p.price}</p>
+
+    </div>
+
+    `;
+  });
+}
+
+load();
+
+
+// OPEN PRODUCT
+function openP(id){
+
+  const p = products.find(x=>x.id==id);
+
+  if(!p) return;
+
+  selectedProduct = p.name;
+
+  selectedProductId = p.id;
+
+  document.getElementById("mName").innerText =
+    p.name;
+
+  document.getElementById("mPrice").innerText =
+    "₹"+p.price;
+
+  document.getElementById("mDesc").innerText =
+    p.desc || "No description";
+
+  const mainImg =
+    document.getElementById("mainImg");
+
+  const thumbs =
+    document.getElementById("thumbs");
+
+  mainImg.src =
+    (p.images && p.images.length)
+    ? p.images[0]
+    : "https://via.placeholder.com/300";
+
+  thumbs.innerHTML = "";
+
+  (p.images || []).forEach((img, i)=>{
+
+    const t = document.createElement("img");
+
+    t.src = img;
+
+    if(i===0) t.classList.add("active");
+
+    t.onclick = ()=>{
+
+      mainImg.src = img;
+
+      document.querySelectorAll(".thumbs img")
+      .forEach(x=>x.classList.remove("active"));
+
+      t.classList.add("active");
+    };
+
+    thumbs.appendChild(t);
+
+  });
+
+  document.getElementById("cartBtn").onclick =
+    ()=>addToCart(p.id);
+
+  document.getElementById("modal").style.display =
+    "block";
+}
+
+function closeModal(){
+
+  document.getElementById("modal").style.display =
+    "none";
+}
+
+
+// ADD TO CART
+async function addToCart(product_id){
+
+  const user_id =
+    localStorage.getItem("user_id");
+
+  if(!user_id){
+
+    alert("Login first");
+
+    openAuth();
+
+    return;
+  }
+
+  await fetch("http://127.0.0.1:8000/add-to-cart", {
+
+    method:"POST",
+
+    headers:{
+      "Content-Type":"application/json"
+    },
+
+    body: JSON.stringify({
+
+      user_id:Number(user_id),
+
+      product_id:Number(product_id)
+
+    })
+
+  });
+
+  alert("Added to cart ✅");
+}
+
+
+// BUY BUTTON
+function buyNow(){
+
+  const user_id =
+    localStorage.getItem("user_id");
+
+  if(!user_id){
+
+    alert("Login first");
+
+    openAuth();
+
+    return;
+  }
+
+  document.getElementById("orderForm")
+  .style.display = "block";
+}
+
+
+// CONFIRM ORDER
+async function confirmOrder(){
+
+  const user_id =
+    localStorage.getItem("user_id");
+
+  if(!user_id){
+
+    alert("Login first");
+
+    return;
+  }
+
+  const name =
+    document.getElementById("buyerName").value;
+
+  const phone =
+    document.getElementById("buyerPhone").value;
+
+  const address =
+    document.getElementById("buyerAddress").value;
+
+  // SAVE ORDER
+  await fetch(
+    "http://127.0.0.1:8000/place-order",
+    {
+
+      method:"POST",
+
+      headers:{
+        "Content-Type":"application/json"
+      },
+
+      body: JSON.stringify({
+
+        user_id:Number(user_id),
+
+        product_id:Number(selectedProductId),
+
+        product:selectedProduct,
+
+        name:name,
+
+        phone:phone,
+
+        address:address
+
+      })
+
+    }
+  );
+
+  // SEND EMAIL
+  await fetch(
+    "http://127.0.0.1:8000/send-order-email",
+    {
+
+      method:"POST",
+
+      headers:{
+        "Content-Type":"application/json"
+      },
+
+      body: JSON.stringify({
+
+        product:selectedProduct,
+
+        name:name,
+
+        phone:phone,
+
+        address:address
+
+      })
+
+    }
+  );
+
+  alert("Order placed ✅");
+}
+
+
+// LOAD ORDERS
+async function loadOrders(){
+
+  document.getElementById("products")
+  .style.display = "none";
+
+  document.getElementById("ordersSection")
+  .style.display = "block";
+
+  const user_id =
+    localStorage.getItem("user_id");
+
+  if(!user_id){
+
+    alert("Login first");
+
+    openAuth();
+
+    return;
+  }
+
+  const res = await fetch(
+    `http://127.0.0.1:8000/my-orders/${user_id}`
+  );
+
+  const data = await res.json();
+
+  const div =
+    document.getElementById("ordersSection");
+
+  div.innerHTML = "<h2>My Orders</h2>";
+
+  data.forEach(o=>{
+
+    const img =
+      (o.images && o.images.length)
+      ? o.images[0]
+      : "https://via.placeholder.com/150";
+
+    div.innerHTML += `
+
+    <div class="orderCard">
+
+      <img src="${img}">
+
+      <div>
+
+        <h3>${o.product_name}</h3>
+
+        <p>₹${o.price}</p>
+
+        <p>${o.description}</p>
+
+        <p><b>Phone:</b> ${o.phone}</p>
+
+        <p><b>Address:</b> ${o.address}</p>
+
+        <p><b>Date:</b> ${o.created_at}</p>
+
+      </div>
+
+    </div>
+
+    `;
+  });
+}
+
+
+// SHOW PRODUCTS
+function showProducts(){
+
+  document.getElementById("products")
+  .style.display = "grid";
+
+  document.getElementById("ordersSection")
+  .style.display = "none";
+}
+
+
+// AUTH
+function openAuth(){
+
+  document.getElementById("authModal")
+  .style.display = "block";
+}
+
+function closeAuth(){
+
+  document.getElementById("authModal")
+  .style.display = "none";
+}
+
+function toggleMode(){
+
+  isLogin = !isLogin;
+
+  document.getElementById("title").innerText =
+    isLogin ? "Login" : "Signup";
+
+  document.getElementById("btn").innerText =
+    isLogin ? "Login" : "Signup";
+
+  document.getElementById("toggleText").innerText =
+    isLogin
+    ? "Don't have account? Signup"
+    : "Already have account? Login";
+
+  document.getElementById("otp")
+  .style.display = "none";
+}
+
+
+// HANDLE AUTH
+async function handleAuth(){
+
+  const email =
+    document.getElementById("email").value;
+
+  const password =
+    document.getElementById("password").value;
+
+  const otp =
+    document.getElementById("otp").value;
+
+  // LOGIN
+  if(isLogin){
+
+    const res = await fetch(
+      "http://127.0.0.1:8000/login",
+      {
+
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        body: JSON.stringify({
+          email,
+          password
+        })
+
+      }
+    );
+
+    const data = await res.json();
+
+    if(data.success){
+
+      localStorage.setItem(
+        "user_id",
+        data.user_id
+      );
+
+      document.getElementById("msg")
+      .innerText = "Login success ✅";
+
+      closeAuth();
+
+    }else{
+
+      document.getElementById("msg")
+      .innerText = data.message;
+    }
+
+    return;
+  }
+
+  // SEND OTP
+  if(
+    document.getElementById("otp")
+    .style.display === "none"
+  ){
+
+    const res = await fetch(
+      "http://127.0.0.1:8000/send-otp",
+      {
+
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        body: JSON.stringify({
+          email,
+          password
+        })
+
+      }
+    );
+
+    const data = await res.json();
+
+    document.getElementById("msg")
+    .innerText = data.message;
+
+    if(data.success){
+
+      document.getElementById("otp")
+      .style.display = "block";
+
+      document.getElementById("btn")
+      .innerText = "Verify OTP";
+    }
+
+    return;
+  }
+
+  // VERIFY OTP
+  const res = await fetch(
+    "http://127.0.0.1:8000/verify-otp",
+    {
+
+      method:"POST",
+
+      headers:{
+        "Content-Type":"application/json"
+      },
+
+      body: JSON.stringify({
+        email,
+        password,
+        otp
+      })
+
+    }
+  );
+
+  const data = await res.json();
+
+  document.getElementById("msg")
+  .innerText = data.message;
+
+  if(data.success){
+
+    document.getElementById("otp")
+    .style.display = "none";
+
+    document.getElementById("btn")
+    .innerText = "Signup";
+
+    alert("Signup success ✅");
+  }
+}
+
+
+// LOGOUT
+function logout(){
+
+  localStorage.removeItem("user_id");
+
+  alert("Logged out");
+}
+
+</script>
+
+</body>
+</html>
