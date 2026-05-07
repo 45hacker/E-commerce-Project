@@ -428,7 +428,7 @@ def send_order_email(data: EmailOrder):
 
     headers = {
         "accept": "application/json",
-        "api-key": "REDACTED_EMAIL_API_KEY",
+        "api-key": EMAIL_API_KEY,
         "content-type": "application/json"
     }
 
